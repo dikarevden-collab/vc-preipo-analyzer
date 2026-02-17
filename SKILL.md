@@ -9,7 +9,7 @@ Structured due diligence framework for evaluating private company investments ac
 
 ## Sector Detection & Specialization
 
-Automatically detect the company's sector and apply the relevant sector overlay from `sector-overlays.md`. **Read only the matching sector section** from that file — do not load all overlays into context. If the sector is ambiguous, ask the user to confirm before proceeding.
+Automatically detect the company's sector and apply the relevant sector overlay from `references/sector-overlays.md`. **Read only the matching sector section** from that file — do not load all overlays into context. If the sector is ambiguous, ask the user to confirm before proceeding.
 
 **Supported sectors:**
 - **SaaS / Cloud Software** — NRR-driven, subscription metrics, Magic Number
@@ -22,7 +22,7 @@ Automatically detect the company's sector and apply the relevant sector overlay 
 - **Marketplace / Platform** — GMV, take rate, liquidity, supply/demand balance
 - **Consumer / D2C** — Brand equity, repeat rates, CAC channels, retail distribution
 
-After identifying the sector, **append the sector-specific questions and metrics** from `sector-overlays.md` to each relevant section of the analysis. Sector-specific items are additive — they do not replace the core framework, they extend it.
+After identifying the sector, **append the sector-specific questions and metrics** from `references/sector-overlays.md` to each relevant section of the analysis. Sector-specific items are additive — they do not replace the core framework, they extend it.
 
 ## Missing Data Protocol
 
@@ -162,7 +162,7 @@ When analyzing a company, follow this structured sequence:
 - Apply private company discount (typically 20-40%, justify the specific discount used)
 - Calculate implied valuation range for the target company
 - Assess whether current private valuation is at premium or discount to public comps
-- Reference file: see `comparable-multiples.md` for detailed methodology
+- Reference file: see `references/comparable-multiples.md` for detailed methodology
 
 ### 4. Market Context & Competitive Position
 - TAM estimate with source and methodology
@@ -245,13 +245,44 @@ Score each dimension 1-10 (1 = minimal risk, 10 = critical risk):
 - Management references and background checks
 - Prior research notes and internal memos
 
+## Bundled Scripts
+
+Use these scripts for deterministic, repeatable data extraction and fetching.
+
+### `scripts/fetch_yahoo_finance.py`
+Fetch structured public comp data from Yahoo Finance. Run this for Section 3 (Comparable Public Multiples).
+```bash
+python scripts/fetch_yahoo_finance.py WISE.L RELY DLO FLYW PAYONEER WU --format table
+```
+Output: markdown table with market cap, EV/Revenue, EV/EBITDA, EV/GP, margins, Rule of 40, median row. Source attribution is printed to stderr automatically.
+
+Requires: `pip install yfinance`
+
+### `scripts/extract_pdf.py`
+Extract text from data room PDFs. Use for pitch decks, executive summaries, financial reports.
+```bash
+python scripts/extract_pdf.py "path/to/file.pdf" --pages 1-10 --max-chars 50000
+```
+Handles Windows Unicode issues automatically.
+
+Requires: `pip install PyPDF2`
+
+### `scripts/extract_excel.py`
+Extract data from Excel files. Use for financial models, cap tables, OPEX breakdowns.
+```bash
+python scripts/extract_excel.py "path/to/model.xlsx" --sheets "Income Statement,Cap Table" --max-rows 200
+```
+Reads formula results (not formulas) by default.
+
+Requires: `pip install openpyxl`
+
 ## Context Efficiency
 
-To avoid prompt-too-long errors, load supporting files **selectively**:
-- `sector-overlays.md` — read **only** the detected sector section, not the entire file
-- `comparable-multiples.md` — read when building the comp table (Section 3)
-- `analysis-template.md` — reference for output structure; load at output time
-- `due-diligence-checklist.md` — load only if the user requests a DD status check
+Load supporting files **selectively** to avoid prompt-too-long errors:
+- `references/sector-overlays.md` — read **only** the detected sector section, not the entire file
+- `references/comparable-multiples.md` — read when building the comp table (Section 3)
+- `assets/analysis-template.md` — reference for output structure; load at output time
+- `references/due-diligence-checklist.md` — load only if the user requests a DD status check
 - Do NOT load all supporting files upfront. Read each only when its section is being worked on.
 
 ## Input Requirements
@@ -284,7 +315,7 @@ The final deliverable is a **standalone investment memo** saved as a markdown fi
 - If data is older than 6 months, flag it as `[STALE — as of YYYY-MM]`
 
 ### Reference file
-See `analysis-template.md` for the full standardized output structure with all tables and sections.
+See `assets/analysis-template.md` for the full standardized output structure with all tables and sections.
 
 ## Example Usage
 

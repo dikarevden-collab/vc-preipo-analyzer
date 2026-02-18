@@ -276,6 +276,15 @@ Reads formula results (not formulas) by default.
 
 Requires: `pip install openpyxl`
 
+### `scripts/push_to_notion.py`
+Push a completed memo to an existing Notion page as formatted blocks (headings, tables, bullets, bold/italic, dividers, checkboxes).
+```bash
+python scripts/push_to_notion.py PAGE_ID "path/to/memo.md" --token $NOTION_TOKEN
+```
+Batches blocks in groups of 100 (Notion API limit). Falls back to block-by-block on errors.
+
+Requires: `pip install requests`
+
 ## Context Efficiency
 
 Load supporting files **selectively** to avoid prompt-too-long errors:
@@ -295,10 +304,15 @@ Load supporting files **selectively** to avoid prompt-too-long errors:
 
 ## Output Format: Investment Memo
 
-The final deliverable is a **standalone investment memo** saved as a markdown file in the `output/` directory. The memo must be:
+The final deliverable is a **standalone investment memo** saved as a markdown file. The memo must be:
 - **Self-contained** — readable by someone who has not seen the data room or conversation
 - **Ready for human review** — the analyst generates it, a human reviews, edits, and finalizes
-- **Saved to disk** — written to `output/[Company]-Analysis-[YYYY-MM-DD].md`
+- **Dual save** — written to local project folder AND pushed to Notion (see below)
+
+### Local Save Convention
+- If user provides a `--folder` path (e.g., `C:\Users\denis\OneDrive\Work\Paysend`), save the memo there as `[Company]-Analysis-[YYYY-MM-DD].md`
+- If no folder specified, save to the skill's `output/` directory as fallback
+- The user's convention: create a local folder for each project, put data room files in it, provide the path when invoking the skill. The skill reads from there and saves the memo there.
 
 ### Memo Structure (mandatory, in this order)
 1. **Header** — Company name, date, sector, data freshness, conviction rating
@@ -331,47 +345,31 @@ See `assets/analysis-template.md` for the full standardized output structure wit
 
 ## Post-Analysis: Notion Export
 
-After completing the analysis, export the results to Notion via MCP.
+After completing the analysis and saving the memo locally, push it to the Notion database.
 
-### Requirements
-- Notion MCP server must be configured and connected in Claude Code
-- Target database ID must be set (configure in this section when ready)
+### Configuration
+- **Database ID:** `1dfe5367-1ac8-8045-ab59-cd61c9f6d622` (Companies Cards)
+- **Token env var:** `NOTION_TOKEN` (configured in Notion MCP server)
 
-### Export Mapping
-Map the analysis output to Notion database properties:
+### Export Steps
+1. Create a page in the database via Notion API:
+   ```bash
+   curl -s -X POST "https://api.notion.com/v1/pages" \
+     -H "Authorization: Bearer $NOTION_TOKEN" \
+     -H "Notion-Version: 2022-06-28" \
+     -H "Content-Type: application/json" \
+     -d '{"parent": {"database_id": "1dfe5367-1ac8-8045-ab59-cd61c9f6d622"}, "properties": {"Company": {"title": [{"type": "text", "text": {"content": "COMPANY_NAME"}}]}, "Sector": {"rich_text": [{"type": "text", "text": {"content": "SECTOR"}}]}}}'
+   ```
+2. Push the formatted memo using the bundled script:
+   ```bash
+   python scripts/push_to_notion.py PAGE_ID memo_file.md --token $NOTION_TOKEN
+   ```
+   This converts markdown headings, tables, bullets, bold/italic, dividers, and checkboxes into native Notion blocks.
 
-| Notion Property | Type | Source |
-|----------------|------|--------|
-| Company Name | Title | Section 1: Full Name |
-| Sector | Select | Detected sector |
-| Conviction Rating | Select | Section 9: Strong Pass / Pass / Neutral / Buy / Strong Buy |
-| Last Valuation ($M) | Number | Section 1: Last round valuation |
-| Secondary Valuation ($M) | Number | Section 1: Secondary market valuation |
-| ARR ($M) | Number | Section 2: ARR |
-| Revenue Growth YoY (%) | Number | Section 2: YoY growth |
-| Gross Margin (%) | Number | Section 2: Gross margin |
-| Burn Rate ($M/mo) | Number | Section 2: Monthly burn |
-| Runway (months) | Number | Section 2: Implied runway |
-| Implied EV — Comps ($M) | Number | Section 3: Blended implied EV |
-| Comp Premium/Discount (%) | Number | Section 3: Current vs. implied |
-| Risk Score (Composite) | Number | Section 7: Weighted composite |
-| Expected IRR (%) | Number | Section 8: Probability-weighted IRR |
-| Expected MOIC | Number | Section 8: Probability-weighted MOIC |
-| Data Completeness (%) | Number | Missing Data Protocol: completeness score |
-| Analysis Date | Date | Date of analysis |
-| Full Memo | Text (long) | Complete analysis output |
-| Status | Select | New / In DD / Passed / Invested |
-| Key Risks | Multi-select | Top risk dimensions scoring 7+ |
-| Follow-up Items | Text | Section 9: Remaining diligence questions |
+### Database Properties (Companies Cards)
+The database uses a scoring system. Populate `Company` (title) and `Sector` (rich_text) at page creation. Other properties (scoring columns, Decision) are filled manually by the user after review.
 
-### Export Command
-After analysis is complete, use the Notion MCP tool to:
-1. Create a new page in the target database
-2. Populate all properties from the mapping above
-3. Paste the full analysis memo into the page body
-4. Confirm successful export to the user
-
-**Note:** Notion database ID and MCP configuration to be set when ready. The skill will skip the export step if Notion MCP is not connected.
+**If Notion MCP is unavailable or the database is not shared with the integration, skip the export step and inform the user.**
 
 ## Best Practices Applied
 

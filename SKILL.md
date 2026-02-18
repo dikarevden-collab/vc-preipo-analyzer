@@ -285,6 +285,15 @@ Batches blocks in groups of 100 (Notion API limit). Falls back to block-by-block
 
 Requires: `pip install requests`
 
+### `scripts/generate_pdf.py`
+Generate a Notion-styled PDF from a markdown memo. Used as the final output step — saves PDF to the user's project folder.
+```bash
+python scripts/generate_pdf.py "path/to/memo.md" --output "path/to/output.pdf"
+```
+Notion-like CSS: clean typography, formatted tables, alternating row colors, proper heading hierarchy. If `--output` is omitted, saves PDF next to the source `.md` file.
+
+Requires: `pip install markdown xhtml2pdf`
+
 ## Context Efficiency
 
 Load supporting files **selectively** to avoid prompt-too-long errors:
@@ -313,6 +322,12 @@ The final deliverable is a **standalone investment memo** saved as a markdown fi
 - If user provides a `--folder` path (e.g., `C:\Users\denis\OneDrive\Work\Paysend`), save the memo there as `[Company]-Analysis-[YYYY-MM-DD].md`
 - If no folder specified, save to the skill's `output/` directory as fallback
 - The user's convention: create a local folder for each project, put data room files in it, provide the path when invoking the skill. The skill reads from there and saves the memo there.
+
+### Post-Analysis Output Pipeline
+After the memo markdown is written, execute these steps automatically:
+1. **Generate PDF** — `python scripts/generate_pdf.py memo.md --output "folder/Company-Analysis-YYYY-MM-DD.pdf"` (saves to the user's project folder)
+2. **Push to Notion** — create page in Companies Cards database, then run `python scripts/push_to_notion.py PAGE_ID memo.md --token $NOTION_TOKEN`
+3. **Confirm to user** — report local file paths (md + pdf) and Notion page URL
 
 ### Memo Structure (mandatory, in this order)
 1. **Header** — Company name, date, sector, data freshness, conviction rating

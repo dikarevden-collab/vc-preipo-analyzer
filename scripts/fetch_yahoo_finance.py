@@ -93,6 +93,96 @@ def fetch_ticker_data(ticker_symbol: str) -> dict:
     }
 
 
+def validate_ticker(data: dict) -> list[str]:
+    """Cross-check fetched multiples for internal consistency. Returns list of warnings."""
+    warnings = []
+    ticker = data.get("ticker", "?")
+
+    # 1. EV/Revenue vs Price/Sales should be in the same ballpark
+    ev_rev = data.get("ev_revenue_ttm")
+    ps = data.get("price_to_sales")
+    if ev_rev and ps and ps > 0:
+        ratio = ev_rev / ps
+        if ratio > 2.0 or ratio < 0.5:
+            warnings.append(f"{ticker}: EV/Rev ({ev_rev}) vs P/S ({ps}) diverge by {ratio:.1f}x — check debt/cash")
+
+    # 2. EV/GP should be >= EV/Revenue (since GP <= Revenue)
+    ev_gp = data.get("ev_gross_profit")
+    if ev_rev and ev_gp and ev_rev > 0 and ev_gp < ev_rev * 0.95:
+        warnings.append(f"{ticker}: EV/GP ({ev_gp}) < EV/Rev ({ev_rev}) — impossible, data inconsistency")
+
+    # 3. Gross margin sanity (should be 0-100%)
+    gm = data.get("gross_margin_pct")
+    if gm is not None and (gm < 0 or gm > 100):
+        warnings.append(f"{ticker}: Gross margin {gm}% outside 0-100% range")
+
+    # 4. EV/GP cross-check against EV/Rev / Gross Margin
+    if ev_rev and gm and gm > 0:
+        expected_ev_gp = round(ev_rev / (gm / 100), 2)
+        if ev_gp and abs(ev_gp - expected_ev_gp) / max(ev_gp, expected_ev_gp) > 0.15:
+            warnings.append(f"{ticker}: EV/GP ({ev_gp}) vs computed EV/Rev÷GM ({expected_ev_gp}) — {abs(ev_gp - expected_ev_gp)/max(ev_gp, expected_ev_gp)*100:.0f}% drift")
+
+    # 5. Negative multiples (distressed or data error)
+    if ev_rev is not None and ev_rev < 0:
+        warnings.append(f"{ticker}: Negative EV/Revenue ({ev_rev}) — likely negative EV (cash > mkt cap + debt)")
+    ev_ebitda = data.get("ev_ebitda_ttm")
+    if ev_ebitda is not None and ev_ebitda < 0:
+        warnings.append(f"{ticker}: Negative EV/EBITDA ({ev_ebitda}) — negative EBITDA or negative EV")
+
+    # 6. Extreme outlier multiples
+    if ev_rev is not None and ev_rev > 50:
+        warnings.append(f"{ticker}: EV/Revenue ({ev_rev}x) extremely high — verify")
+    if ev_ebitda is not None and ev_ebitda > 100:
+        warnings.append(f"{ticker}: EV/EBITDA ({ev_ebitda}x) extremely high — verify")
+    if data.get("trailing_pe") is not None and data["trailing_pe"] > 200:
+        warnings.append(f"{ticker}: P/E ({data['trailing_pe']}x) extremely high — verify")
+
+    # 7. Missing critical fields
+    missing = []
+    for key, label in [("market_cap_B", "market cap"), ("ev_revenue_ttm", "EV/Revenue"),
+                        ("total_revenue_M", "revenue"), ("gross_margin_pct", "gross margin")]:
+        if data.get(key) is None:
+            missing.append(label)
+    if missing:
+        warnings.append(f"{ticker}: Missing critical data — {', '.join(missing)}")
+
+    # 8. Revenue growth sanity
+    rg = data.get("revenue_growth_pct")
+    if rg is not None and (rg > 500 or rg < -90):
+        warnings.append(f"{ticker}: Revenue growth {rg}% looks extreme — verify")
+
+    return warnings
+
+
+def validate_peer_set(results: list[dict]) -> list[str]:
+    """Cross-validate multiples across the peer set. Flag outliers beyond 2x IQR."""
+    warnings = []
+    valid = [r for r in results if r.get("error") is None]
+    if len(valid) < 3:
+        return warnings
+
+    for key, label in [("ev_revenue_ttm", "EV/Revenue"), ("ev_ebitda_ttm", "EV/EBITDA"),
+                        ("gross_margin_pct", "Gross Margin %"), ("revenue_growth_pct", "Rev Growth %")]:
+        values = [(r["ticker"], r[key]) for r in valid if r.get(key) is not None]
+        if len(values) < 3:
+            continue
+        nums = sorted([v for _, v in values])
+        q1_idx = len(nums) // 4
+        q3_idx = 3 * len(nums) // 4
+        q1 = nums[q1_idx]
+        q3 = nums[q3_idx]
+        iqr = q3 - q1
+        if iqr == 0:
+            continue
+        lower = q1 - 2 * iqr
+        upper = q3 + 2 * iqr
+        for ticker, val in values:
+            if val < lower or val > upper:
+                warnings.append(f"{ticker}: {label} ({val}) is a peer-set outlier (IQR range: {round(lower, 1)}–{round(upper, 1)})")
+
+    return warnings
+
+
 def format_table(results: list[dict]) -> str:
     """Format results as a markdown table."""
     headers = [

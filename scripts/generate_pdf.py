@@ -4,8 +4,8 @@
 Usage:
     python scripts/generate_pdf.py <memo.md> [--output path/to/output.pdf]
 
-If --output is not specified, saves PDF next to the source markdown file
-with the same name but .pdf extension.
+If --output is not specified, derives the PDF name from the source markdown
+following the convention: YYYY MM DD CompanyName Investment Case.pdf
 
 Style: Clean Notion-like formatting with proper headings, tables, and spacing.
 
@@ -285,7 +285,8 @@ def convert_md_to_pdf(md_path: str, pdf_path: str):
 def main():
     parser = argparse.ArgumentParser(description="Generate PDF from markdown memo")
     parser.add_argument("memo_file", help="Path to markdown memo file")
-    parser.add_argument("--output", "-o", help="Output PDF path (default: same name as input with .pdf)")
+    parser.add_argument("--output", "-o", help="Output PDF path (default: YYYY MM DD Company Investment Case.pdf)")
+    parser.add_argument("--company", "-c", help="Company name for default filename (if not using --output)")
     args = parser.parse_args()
 
     if not os.path.exists(args.memo_file):
@@ -295,7 +296,21 @@ def main():
     if args.output:
         pdf_path = args.output
     else:
-        pdf_path = os.path.splitext(args.memo_file)[0] + ".pdf"
+        from datetime import date
+        today = date.today()
+        date_str = today.strftime("%Y %m %d")
+        if args.company:
+            company = args.company
+        else:
+            # Try to extract company name from the markdown filename
+            basename = os.path.splitext(os.path.basename(args.memo_file))[0]
+            # Strip common suffixes like -Analysis-YYYY-MM-DD
+            company = re.sub(r'[-_]Analysis[-_]\d{4}[-_]\d{2}[-_]\d{2}', '', basename)
+            company = company.replace('-', ' ').replace('_', ' ').strip()
+        pdf_path = os.path.join(
+            os.path.dirname(args.memo_file) or ".",
+            f"{date_str} {company} Investment Case.pdf"
+        )
 
     # Ensure output directory exists
     os.makedirs(os.path.dirname(pdf_path) or ".", exist_ok=True)

@@ -1,6 +1,6 @@
 # Investment Analysis Output Template
 
-Use this structure for all VC/Pre-IPO analysis output. Save the completed memo to `output/[Company]-Analysis-[YYYY-MM-DD].md`.
+Use this structure for all VC/Pre-IPO analysis output. Save the completed memo as `YYYY MM DD CompanyName Investment Case.md` (e.g., `2026 02 17 Paysend Investment Case.md`).
 
 **Source attribution is mandatory.** Every section that uses external data must include a `**Sources:**` block at the end citing the specific source, URL where applicable, and access date.
 

@@ -1,0 +1,8 @@
+# Normalize all text files to LF in the repo
+* text=auto eol=lf
+
+# Explicitly mark binary files
+*.pdf binary
+*.png binary
+*.jpg binary
+*.xlsx binary

@@ -20,7 +20,7 @@ Given a company name, pitch deck, or financial data, the skill produces a **stan
 | 10 | Supporting Materials | Data room links, pitch deck notes, articles |
 # VC / Pre-IPO Investment Analyzer
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that generates institutional-grade investment memos for private company due diligence. It produces structured, 10-section analyses covering financials, compa
+An Agent skill that generates institutional-grade investment memos for private company due diligence. It produces structured, 10-section analyses covering financials, compa
 Every data point is sourced and cited. Missing information is explicitly marked `[NO INFO]` or `[ESTIMATED — basis: ...]` with materiality ratings — the memo never guesses.
 
 ## Sector Specialization
@@ -69,7 +69,7 @@ vc-preipo-analyzer/
 
 ### Prerequisites
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI / Gemini CLI / Other
 - Python 3.9+
 
 ### Install

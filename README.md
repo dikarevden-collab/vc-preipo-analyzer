@@ -1,3 +1,6 @@
+Thank you for the Star!
+
+I am a VC/Pre-IPO professional so I wrote this skill to help me analyze investment opportunities.
 
 ## What It Does
 

@@ -35,6 +35,11 @@ Use this structure for all VC/Pre-IPO analysis output. Save the completed memo a
 | Last Funding Round | [Date] — [Series X] at $[X]B valuation |
 | Total Funding Raised | $[X]M |
 | Secondary Market Valuation | $[X]B (as of [date]) |
+| Secondary Price (Forge) | $[X] per share — [date] |
+| Secondary Price (Caplight) | $[X] per share — [date] |
+| Secondary Price (Hiive) | $[X] per share — [date] |
+| Secondary Average | $[X] per share — implied valuation $[X]B |
+| Secondary Spread | [X]% (max - min / avg) |
 | Cap Table Summary | Founders: [X]%, Employees: [X]%, Investors: [X]% |
 
 ---
@@ -302,6 +307,17 @@ Use this structure for all VC/Pre-IPO analysis output. Save the completed memo a
 | Base | [X]% | | | | | |
 | Bear | [X]% | | | | | |
 | **Expected** | 100% | | | **[X]%** | **[X]x** | |
+
+### Market-Implied Valuation (Secondary Platforms)
+
+| Platform | Price / Share | Implied Valuation | vs Last Round | Source |
+|----------|-------------|-------------------|---------------|--------|
+| Forge Global | $[X] | $[X]B | [+/-X]% | [forgeglobal.com](URL) — [date] |
+| Caplight | $[X] | $[X]B | [+/-X]% | [caplight.com](URL) — [date] |
+| Hiive | $[X] | $[X]B | [+/-X]% | [hiive.com](URL) — [date] |
+| **Average** | **$[X]** | **$[X]B** | **[+/-X]%** | |
+
+**Secondary spread:** [X]% — [interpretation: tight = consensus, wide = uncertainty]
 
 ### IRR Sensitivity (Base Case Exit Multiple)
 

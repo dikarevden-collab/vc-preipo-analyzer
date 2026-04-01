@@ -1,9 +1,10 @@
 ---
 name: vc-preipo-analyzer
-description: ALWAYS invoke for VC/pre-IPO investment analysis when user asks to analyze a company, run due diligence, evaluate an investment, build a comp table, or wants an investment memo. Do NOT analyze directly -- use this skill first.
-metadata:
-  author: RLC Research
-  version: 2.1.0
+description: >
+  Structured due diligence and investment memo for private/pre-IPO companies.
+  Use when user asks to analyze a company, evaluate an investment, run due
+  diligence, build a comp table, or write an investment memo. Do NOT use for
+  general market Q&A, public equity research, or research notes.
 ---
 
 # VC / Pre-IPO Investment Analyzer
@@ -26,6 +27,27 @@ Structured due diligence framework for evaluating private company investments ac
 - Research notes or market commentary — use **research-note-generator** instead
 - Financial modeling deep-dives without a specific company — use Anthropic's `creating-financial-models` skill
 - Ratio analysis on public company financials — use `analyzing-financial-statements` skill
+
+## Deal Intake Interview
+
+Before starting research, collect deal-specific context the tool cannot find on its own. **Company name is the only required field** — all others are optional but significantly improve memo quality.
+
+Present these questions to the user as a numbered list. Wait for answers before proceeding.
+
+1. **Company name** *(required)*
+2. **Materials** — "Do you have files to provide? Attach them or give a folder path (deck, data room, financials, cap table, website URL)"
+3. **Deal terms** — Entry valuation, price per share, share class, deal structure (secondary / SPV / direct / primary co-invest)
+4. **Investment horizon** — Quick flip (<1yr), medium-term (2-3yr), or hold-to-IPO (5yr+)?
+5. **Target return** — MOIC floor or IRR minimum the deal must clear?
+6. **Appeal to investors** — Who are the target LPs / co-investors? Has any pre-marketing been done? What's the reception so far?
+7. **Why this company?** — Origination story. Why was it selected over alternatives? Who brought the deal?
+8. **Specific concerns** — Any risks or questions you want pressure-tested?
+
+**Smart skip logic:** [Low freedom — must follow]
+- Parse the user's initial message for answers already provided (e.g., "analyze SpaceX at $350B, secondary, 3yr hold" → questions 1, 3, 4 are answered)
+- Only ask questions whose answers are not yet known
+- If user says "just run it" or "skip interview" → proceed with company name only, produce generic analysis
+- After materials are ingested (PDFs, Excel), reassess which questions are already answered by the documents before asking remaining ones
 
 ## Sector Detection & Specialization
 
@@ -66,16 +88,19 @@ All external data must come from verifiable, authoritative sources.
 
 Load `references/analysis-framework.md` when starting. Each section's detailed checklist is there.
 
+0. **Deal Intake Interview** — collect deal context from user (see above)
 1. **Company Overview** — identity, funding, cap table
 2. **Financial Deep Dive** — revenue, unit economics, margins, burn
 - [ ] Checkpoint: all metrics present or marked [NO INFO] with materiality
 3. **Comparable Public Multiples** — run `scripts/fetch_yahoo_finance.py`; see `references/comparable-multiples.md`
+3.5. **Secondary Market Pricing** — run `scripts/fetch_secondary_prices.sh`; see `references/secondary-selectors.md`
+- [ ] Checkpoint: secondary prices fetched from Forge/Caplight/Hiive or marked [NO INFO]
 4. **Market Context** — TAM/SAM/SOM, moats, competitive landscape
 - [ ] Checkpoint: sector overlay applied, comps fetched, TTM vs NTM labeled
 5. **Growth & Momentum** — operating metrics, efficiency, catalysts
 6. **Investor & Governance** — round history, board quality
 7. **Risk Assessment** — weighted 8-dimension scoring matrix
-8. **Valuation & Return** — scenarios, IRR, MOIC, exit pathways
+8. **Valuation & Return** — scenarios, IRR, MOIC, exit pathways, secondary-implied valuation
 - [ ] Checkpoint: scenario probabilities sum to 100%; IRR uses consistent entry valuation
 9. **Investment Thesis** — conviction rating, for/against, remaining questions
 10. **Supporting Materials** — data room, articles, pitch deck notes
@@ -109,7 +134,18 @@ Generate a Notion-styled PDF from a markdown memo.
 ```bash
 python scripts/generate_pdf.py "path/to/memo.md" --output "path/to/output.pdf"
 ```
-Requires: `pip install markdown xhtml2pdf`
+Requires (one of — script auto-detects):
+- `pip install markdown reportlab` (lightweight, no native deps — always works)
+- `pip install markdown xhtml2pdf` (richer HTML/CSS — needs native build tools)
+
+### `scripts/fetch_secondary_prices.sh`
+Scrape secondary market prices for a single company from Forge, Caplight, and Hiive.
+```bash
+bash scripts/fetch_secondary_prices.sh "SpaceX"
+```
+Requires: `agent-browser` CLI (`npm i -g agent-browser`), Chrome debug profile with Caplight + Hiive sessions.
+Outputs JSON to stdout: `{forge: {price, url}, caplight: {price, url}, hiive: {price, url}, company, date}`
+See `references/secondary-selectors.md` for platform navigation details.
 
 ### `scripts/push_to_notion.py`
 Push a completed memo to Notion as formatted blocks.
@@ -126,6 +162,8 @@ Load supporting files **selectively**:
 - `references/analysis-framework.md` — load when starting the analysis
 - `assets/analysis-template.md` — reference for output structure; load at output time
 - `references/due-diligence-checklist.md` — load only if user requests a DD status check
+- `references/secondary-selectors.md` — load when scraping secondary prices (Section 3.5)
+- `references/setup-guide.md` — load if Notion or PDF generation fails, or if user asks about setup
 - `references/faq.md` — load only if user asks how the skill works
 
 ## Input Requirements
@@ -142,7 +180,10 @@ The deliverable is a **standalone investment memo** saved as markdown.
 
 **Local save convention:** [Medium freedom — structure required, prose flexible]
 - If user provides `--folder` path, save there
-- Otherwise save to the skill's `output/` directory
+- Default: `C:\Users\denis\OneDrive - RLC AltInvest Consultants FZCO\Work\{CompanyName}\`
+  - Create the company subfolder if it doesn't exist
+  - If OneDrive path is not available, ask the user where to save
+- Fallback: the skill's `output/` directory
 - Naming: `YYYY MM DD CompanyName Investment Case` (.md / .pdf)
 
 **Post-analysis pipeline:** [Low freedom — execute in order]
@@ -176,6 +217,9 @@ The deliverable is a **standalone investment memo** saved as markdown.
 - **Conflicting sources**: flag explicitly; prefer Company IR > third-party; document in Sources block
 - **No public comps**: fall back to private round multiples; note "no quoted peers — DCF-only valuation"
 - **Secondary pricing, no financials**: proceed with market-implied analysis; label clearly as market sentiment not fundamental
+- **agent-browser not installed**: skip secondary scraping, inform user, mark `[NO INFO]` for secondary prices
+- **Platform login expired**: inform user to re-login in Chrome debug profile (`~/.chrome-debug`), retry or skip
+- **Company not found on secondary platforms**: record `[NO INFO]` per platform, note in memo — company may be too early-stage or not actively traded
 
 ## Quality Checks
 

@@ -47,6 +47,19 @@ When analyzing a company, follow this structured sequence. Each section builds o
 - Assess whether current private valuation is at premium or discount to public comps
 - Reference file: see `references/comparable-multiples.md` for detailed methodology
 
+## 3.5 Secondary Market Pricing
+
+- Run `scripts/fetch_secondary_prices.sh "Company Name"` to scrape live prices
+- Requires: `agent-browser` CLI connected to Chrome debug profile (port 9222)
+- Record prices from each platform:
+  - **Forge Global** — public, no login needed
+  - **Caplight** — requires authenticated session
+  - **Hiive** — requires authenticated session
+- Calculate cross-platform average and price spread (max - min)
+- Compare secondary-implied valuation vs last primary round valuation
+- If agent-browser is unavailable or company not found on any platform → mark `[NO INFO]`
+- Reference: `references/secondary-selectors.md` for platform navigation details
+
 ## 4. Market Context & Competitive Position
 - TAM estimate with source and methodology
 - SAM and SOM with clear assumptions

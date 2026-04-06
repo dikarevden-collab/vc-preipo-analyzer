@@ -104,7 +104,7 @@ Load `references/analysis-framework.md` when starting. Each section's detailed c
 - [ ] Checkpoint: scenario probabilities sum to 100%; IRR uses consistent entry valuation
 9. **Investment Thesis** — conviction rating, for/against, remaining questions
 10. **Supporting Materials** — data room, articles, pitch deck notes
-- [ ] Checkpoint: memo saved, PDF generated, Notion updated (if NOTION_TOKEN set)
+- [ ] Checkpoint: memo saved, PDF generated, Gamma deck generated, Notion updated (if NOTION_TOKEN set)
 
 ## Bundled Scripts
 
@@ -154,6 +154,9 @@ python scripts/push_to_notion.py PAGE_ID "path/to/memo.md" --token $NOTION_TOKEN
 ```
 Requires: `pip install requests`
 
+### Gamma IC Deck (MCP tool)
+Generate a 20-30 slide IC presentation via `mcp__claude_ai_Gamma__generate`. No local dependencies — requires Gamma MCP server connection. See **Gamma IC Deck** section below for full configuration.
+
 ## Context Efficiency
 
 Load supporting files **selectively**:
@@ -189,8 +192,9 @@ The deliverable is a **standalone investment memo** saved as markdown.
 **Post-analysis pipeline:** [Low freedom — execute in order]
 1. **Verification Agent** — run independent fact-check (see below)
 2. Generate PDF — `python scripts/generate_pdf.py memo.md --output "folder/...pdf"`
-3. Push to Notion — create page in Companies Cards database, then `python scripts/push_to_notion.py PAGE_ID memo.md --token $NOTION_TOKEN`
-4. Report file paths, Notion URL, and verification summary to user
+3. **Generate Gamma IC Deck** — see Gamma IC Deck section below
+4. Push to Notion — create page in Companies Cards database, then `python scripts/push_to_notion.py PAGE_ID memo.md --token $NOTION_TOKEN`
+5. Report file paths, Gamma URL, Notion URL, and verification summary to user
 
 ## Verification Agent
 
@@ -247,6 +251,86 @@ After the memo draft is written and before PDF/Notion export, launch an **indepe
 - Token env var: `NOTION_TOKEN`
 - If Notion MCP is unavailable, skip export and inform user.
 
+## Gamma IC Deck
+
+After generating the PDF, create a **25-slide investor presentation** via the Gamma MCP tool. This deck distills the full memo into an IC-ready format.
+
+**Gamma parameters:** [Low freedom — use exact values]
+
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| `inputText` | Full memo markdown (sections 1-10 + exec summary) | Gamma requires complete content — never summarize |
+| `format` | `"presentation"` | IC deck |
+| `numCards` | `25` | Maps 1:1 to memo sections (see slide structure) |
+| `textMode` | `"condense"` | Distills 30-50KB memo into slide-appropriate bullets |
+| `themeId` | `"consultant"` | Interim default — swap to custom RLC theme ID when created |
+| `textOptions` | `{amount: "medium", tone: "professional", audience: "executives"}` | IC audience |
+| `imageOptions` | `{source: "noImages"}` | Data-driven deck, no decorative images |
+| `cardOptions` | `{dimensions: "16x9"}` | Standard presentation aspect ratio |
+| `exportAs` | `"pptx"` | IC members annotate in PowerPoint; PDF memo already exists |
+
+**Theme config:**
+- Default: `consultant` (light, blue, corporate — closest to VC firm aesthetic)
+- When RLC custom theme is created in Gamma web editor, replace `themeId` with the custom ID (single-line swap)
+- To find custom theme ID: call `mcp__claude_ai_Gamma__get_themes` with `name: "RLC"`
+
+**Slide structure** (passed as `additionalInstructions`):
+
+> Create a 25-slide investment committee presentation with this exact structure:
+>
+> **Opening (slides 1-3)**
+> 1. Title slide: Company name, logo placeholder, date, "Investment Committee Presentation", conviction rating badge
+> 2. Executive Summary: 3-4 bullet synthesis — what the company does, key financials, bottom-line recommendation
+> 3. Deal Overview: entry valuation, deal structure, share class, investment horizon, target return
+>
+> **Company & Market (slides 4-8)**
+> 4. Company Overview: founding date, HQ, employees, product description, key customers
+> 5. Funding History & Cap Table: round-by-round table, key investors, ownership breakdown
+> 6. Market Opportunity: TAM/SAM/SOM with sources, market growth rate, key tailwinds
+> 7. Competitive Landscape: positioning map or comparison table, moat assessment (scored 1-5)
+> 8. Headwinds & Tailwinds: two-column layout — risks on left, opportunities on right
+>
+> **Financials (slides 9-14)**
+> 9. Revenue & Growth: ARR/revenue trajectory chart concept, YoY growth rates, revenue mix
+> 10. Unit Economics: CAC, LTV, LTV/CAC ratio, payback period, magic number
+> 11. Profitability & Margins: gross margin, EBITDA margin, burn rate, runway
+> 12. Revenue Quality: NRR, GRR, churn, cohort retention, concentration risk
+> 13. Comparable Public Multiples: comp table (5-10 peers) with EV/Revenue, EV/GP, Rule of 40
+> 14. Implied Valuation: private company discount application, valuation range vs current ask
+>
+> **Secondary Pricing (slide 15)**
+> 15. Secondary Market Data: Forge/Caplight/Hiive prices, spread analysis, vs last primary round
+>
+> **Growth & Governance (slides 16-17)**
+> 16. Growth Metrics & Catalysts: key operating KPIs, near-term catalysts, pipeline
+> 17. Investor & Board Quality: notable investors, board composition, governance signals
+>
+> **Risk & Return (slides 18-22)**
+> 18. Risk Assessment Matrix: 8-dimension weighted scoring table with composite score
+> 19. Critical Risks Deep Dive: top 3 risks (score 7+) with detailed mitigations
+> 20. Scenario Analysis: bull/base/bear table with probabilities, exit multiples, IRR, MOIC
+> 21. IRR Sensitivity: matrix of IRR at various entry prices × exit multiples
+> 22. Exit Pathways: IPO timeline, M&A potential, secondary liquidity, continuation fund
+>
+> **Conclusion (slides 23-25)**
+> 23. Investment Thesis — For: top 3-5 reasons to invest (left column) vs Against: top 3-5 reasons NOT to invest (right column)
+> 24. Key Milestones & Remaining DD: what to monitor, open questions, next steps
+> 25. Recommendation: final conviction rating, proposed allocation, vote request
+>
+> Use tables and structured layouts over prose. Keep bullet points to 4-6 per slide maximum. Use bold for key numbers. No decorative images — this is a data-driven IC deck.
+
+**Execution flow:**
+1. Call `mcp__claude_ai_Gamma__generate` with the above parameters
+2. Capture the `generationId` from the response
+3. Poll `mcp__claude_ai_Gamma__get_generation_status` (up to 3 attempts, 20s apart)
+4. Extract `gammaUrl` from completed status
+5. Report the Gamma URL to user alongside PDF path and Notion URL
+
+**Graceful degradation:**
+- If Gamma MCP is not connected → skip, inform user ("Gamma MCP not available — IC deck not generated. Memo and PDF are ready.")
+- If generation fails → warn user, continue pipeline with PDF + Notion
+- Gamma is an enhancement, not core — the pipeline must never fail because Gamma is down
+
 ## Example Usage
 
 > "Analyze SpaceX as a pre-IPO investment opportunity. Focus on Starlink segment economics."
@@ -269,6 +353,8 @@ After the memo draft is written and before PDF/Notion export, launch an **indepe
 - **agent-browser not installed**: skip secondary scraping, inform user, mark `[NO INFO]` for secondary prices
 - **Platform login expired**: inform user to re-login in Chrome debug profile (`~/.chrome-debug`), retry or skip
 - **Company not found on secondary platforms**: record `[NO INFO]` per platform, note in memo — company may be too early-stage or not actively traded
+- **Gamma MCP unavailable**: skip IC deck generation, inform user, continue with PDF + Notion
+- **Gamma generation fails**: warn user with error details, continue pipeline — Gamma is an enhancement, not core
 
 ## Quality Checks
 

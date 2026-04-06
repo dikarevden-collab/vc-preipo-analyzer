@@ -187,9 +187,58 @@ The deliverable is a **standalone investment memo** saved as markdown.
 - Naming: `YYYY MM DD CompanyName Investment Case` (.md / .pdf)
 
 **Post-analysis pipeline:** [Low freedom — execute in order]
-1. Generate PDF — `python scripts/generate_pdf.py memo.md --output "folder/...pdf"`
-2. Push to Notion — create page in Companies Cards database, then `python scripts/push_to_notion.py PAGE_ID memo.md --token $NOTION_TOKEN`
-3. Report file paths and Notion URL to user
+1. **Verification Agent** — run independent fact-check (see below)
+2. Generate PDF — `python scripts/generate_pdf.py memo.md --output "folder/...pdf"`
+3. Push to Notion — create page in Companies Cards database, then `python scripts/push_to_notion.py PAGE_ID memo.md --token $NOTION_TOKEN`
+4. Report file paths, Notion URL, and verification summary to user
+
+## Verification Agent
+
+After the memo draft is written and before PDF/Notion export, launch an **independent verification agent** (`Agent` tool, subagent_type: `general-purpose`) that audits the memo for factual accuracy.
+
+**Agent briefing template:**
+> You are a fact-checker reviewing an investment memo about {Company}. Your job is to independently verify key claims using web search. You have NOT seen the research that produced this memo — approach it fresh.
+>
+> Read the memo at: {memo_path}
+>
+> Check the following categories. For each claim, search independently and report: CONFIRMED / DISPUTED / UNVERIFIABLE.
+>
+> 1. **Company facts** — founding date, HQ, founders, employee count, funding amounts, valuation
+> 2. **Financial claims** — revenue figures, growth rates, margins, burn rate (if stated)
+> 3. **Market data** — TAM/SAM figures, market growth rates, market share claims
+> 4. **Competitor facts** — funding rounds, valuations, partnerships, product status
+> 5. **Public comp data** — market caps, multiples, revenue (cross-check vs Yahoo Finance)
+> 6. **Partnership/customer claims** — named partners, contract details
+> 7. **Investor roster** — named investors, round participation
+>
+> Output a structured verification report in this exact format:
+>
+> ```
+> ## Verification Report
+> **Verified:** {date}
+> **Claims checked:** {N}
+> **Results:** {confirmed} confirmed, {disputed} disputed, {unverifiable} unverifiable
+>
+> ### Confirmed
+> - {claim} — {source}
+>
+> ### Disputed
+> - {claim} — Memo says: {X}. Found: {Y}. Source: {URL}
+>
+> ### Unverifiable
+> - {claim} — no independent source found
+>
+> ### Accuracy Score: {confirmed / (confirmed + disputed)} %
+> ```
+>
+> Be thorough but concise. Only check factual claims, not opinions or projections. This is research only — do not modify any files.
+
+**Integration rules:** [Low freedom]
+- The verifier agent runs in the **foreground** — wait for results before proceeding
+- Append the verification report to the memo as a new section before the Sources Appendix
+- If any claim is **DISPUTED**, flag it inline in the memo with `[DISPUTED — verifier found: {X}]` and let the analyst (user) decide whether to correct
+- If Accuracy Score < 80%, warn the user before proceeding to PDF/Notion
+- The verifier must use **fresh web searches** — it must not rely on the research agent's earlier findings
 
 **Memo structure:** Header → Executive Summary (2-3 paragraphs, standalone brief) → Sections 1-10 → Sources appendix.
 

@@ -140,3 +140,13 @@ Score each dimension 1-10 (1 = minimal risk, 10 = critical risk):
 - Pitch deck assessment (quality, consistency with financials)
 - Management references and background checks
 - Prior research notes and internal memos
+
+## 11. Verification Report (auto-generated)
+
+After drafting sections 1-10, launch an independent verification agent that:
+- Reads the completed memo draft
+- Independently web-searches all factual claims (company facts, financials, market data, comps, partnerships)
+- Rates each claim: CONFIRMED / DISPUTED / UNVERIFIABLE
+- Produces an Accuracy Score = confirmed / (confirmed + disputed)
+- Flags DISPUTED claims inline in the memo for analyst review
+- This section is appended automatically — do not write it manually

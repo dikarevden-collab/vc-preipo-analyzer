@@ -23,15 +23,18 @@ Reference for `scripts/fetch_secondary_prices.sh`. Describes how to search for a
 ## Caplight (platform.caplight.com)
 
 ### Auth Check
-- Logged in if snapshot contains `denis.dikarev`
-- If not logged in → inform user to re-login in Chrome debug profile
+- Logged in if page does NOT contain sign-in/login/password indicators
+- If not logged in → Chrome window prompts user; script waits up to 90s
+- After login, script reloads `/market` page
 
-### Search Flow
+### Search Flow (snapshot-ref workflow)
 1. Navigate to `https://platform.caplight.com/market`
-2. Press `Control+k` to open search modal
-3. Modal contains: `textbox "Search for a Company or Investor"` inside a `dialog`
-4. Type company name → results appear as links
-5. Click link matching company name → navigates to company page
+2. `agent-browser press "Control+k"` to open search modal (primary method)
+3. `agent-browser snapshot -i` → find textbox/input ref (`@eN`)
+4. `agent-browser type @eN "Company Name"` → wait for results
+5. `agent-browser snapshot -i` → find result ref matching company name
+6. `agent-browser click @eN` → navigates to company page
+7. Fallback: if no ref match, `press ArrowDown` → `press Enter`
 
 ### Price Extraction
 - Label: `StaticText "Caplight MarketPrice™"`
@@ -43,19 +46,25 @@ Reference for `scripts/fetch_secondary_prices.sh`. Describes how to search for a
 ## Hiive (app.hiive.com)
 
 ### Auth Check
-- Logged in if snapshot contains `combobox "Search company"`
-- If not logged in → inform user to re-login in Chrome debug profile
+- Logged in if page does NOT contain sign-in/login/password indicators
+- If not logged in → Chrome window prompts user; script waits up to 90s
+- After login, script reloads `/dashboard` page
 
-### Search Flow
+### Search Flow (snapshot-ref workflow)
 1. Navigate to `https://app.hiive.com/dashboard`
-2. Find and click `combobox "Search company"`
-3. Type company name → options appear in `listbox`
-4. Click matching `option` → navigates to company page
+2. `agent-browser press "Control+k"` to open search (primary method)
+3. `agent-browser snapshot -i` → find textbox/combobox ref (`@eN`)
+4. Fallback: find `"Search company"` combobox ref → `agent-browser click @eN`
+5. `agent-browser type @eN "Company Name"` → wait for dropdown results
+6. Extract price directly from dropdown text (format: `"Company $XX.XX +YY%"`)
+7. If no price in dropdown: `agent-browser click @eN` on result → extract from company page
 
 ### Price Extraction
-- Label: `StaticText "Hiive Price"` (inside a paragraph)
-- Price: `StaticText "$113.00"` in the paragraph following "Hiive Price"
-- Regex on snapshot: `grep -A4 '"Hiive Price"' | grep 'StaticText "\$'`
+- Labels are ALL CAPS: `HIGHEST BID`, `LOWEST ASK`, `HIIVE PRICE`
+- Primary: `HIIVE PRICE` → e.g., `$29.93`
+- Fallback: `HIGHEST BID` → e.g., `$31.00`
+- Regex on snapshot: `grep -iA4 'HIIVE.PRICE' | grep 'StaticText "\$'`
+- Note: some companies have listings but no Hiive Price — use HIGHEST BID as fallback
 
 ---
 

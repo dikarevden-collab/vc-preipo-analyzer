@@ -263,16 +263,15 @@ After generating the PDF, create a **25-slide investor presentation** via the Ga
 | `format` | `"presentation"` | IC deck |
 | `numCards` | `25` | Maps 1:1 to memo sections (see slide structure) |
 | `textMode` | `"condense"` | Distills 30-50KB memo into slide-appropriate bullets |
-| `themeId` | `"consultant"` | Interim default — swap to custom RLC theme ID when created |
+| `themeId` | `"tf15c1vstmnc6z1"` | Interim default — swap to custom RLC theme ID when created |
 | `textOptions` | `{amount: "medium", tone: "professional", audience: "executives"}` | IC audience |
 | `imageOptions` | `{source: "noImages"}` | Data-driven deck, no decorative images |
 | `cardOptions` | `{dimensions: "16x9"}` | Standard presentation aspect ratio |
 | `exportAs` | `"pptx"` | IC members annotate in PowerPoint; PDF memo already exists |
 
 **Theme config:**
-- Default: `consultant` (light, blue, corporate — closest to VC firm aesthetic)
-- When RLC custom theme is created in Gamma web editor, replace `themeId` with the custom ID (single-line swap)
-- To find custom theme ID: call `mcp__claude_ai_Gamma__get_themes` with `name: "RLC"`
+- Custom RLC theme: `tf15c1vstmnc6z1`
+- To update: call `mcp__claude_ai_Gamma__get_themes` with `name: "RLC"` to verify ID
 
 **Slide structure** (passed as `additionalInstructions`):
 

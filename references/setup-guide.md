@@ -51,18 +51,50 @@ python3 -m pip install --user --break-system-packages markdown reportlab request
 
 ## 2. Notion Integration
 
-### Token
+### Important: Internal Integration ≠ claude.ai Notion connector
 
-Set the `NOTION_TOKEN` environment variable before starting Claude Code:
+There are **two completely separate Notion paths**, and only one is durable:
 
+| | Internal Integration (this skill uses) | claude.ai Notion MCP |
+|---|---|---|
+| Created where | https://www.notion.so/profile/integrations | Anthropic web app → Connectors |
+| Token format | `ntn_…` (long-lived, you control it) | OAuth, managed by Anthropic |
+| Used by | `push_to_notion.py` + direct `curl` | `mcp__claude_ai_Notion__*` tools |
+| Block types supported | All (tables, headings, callouts, code) | paragraph + bulleted_list_item only |
+| Stays connected mid-session | Yes — fully local | No — can drop |
+
+**The Internal Integration is the durable path.** The claude.ai MCP connector is fine for lookups but **must not** be used for memo content pushes (it silently drops tables and headings) or for page creation (`notion-create-pages` double-serializes the `parent` field and fails).
+
+### Token setup
+
+**Windows (primary path — PowerShell):**
+```powershell
+[System.Environment]::SetEnvironmentVariable("NOTION_TOKEN", "ntn_XXXXXXXXX", "User")
+```
+Then restart Claude Code so the new env var is loaded by child processes.
+
+Verify it's persisted:
+```powershell
+[System.Environment]::GetEnvironmentVariable("NOTION_TOKEN", "User")
+```
+
+**macOS / Linux:**
 ```bash
 export NOTION_TOKEN=ntn_XXXXXXXXX
+echo 'export NOTION_TOKEN=ntn_XXXXXXXXX' >> ~/.bashrc   # or ~/.zshrc
 ```
 
-To persist across sessions, add to `~/.bashrc` or `~/.zshrc`:
-```bash
-echo 'export NOTION_TOKEN=ntn_XXXXXXXXX' >> ~/.bashrc
-```
+**Do NOT store the token in `~/.claude.json`** under `mcpServers.notionApi.env.NOTION_TOKEN`. That path was used when the legacy `@notionhq/notion-mcp-server` package was configured, but it is brittle (block-type limitations, plus the file is touched by Claude Code at startup). The env-var path is the canonical storage location.
+
+### Share the database with the integration **[required — easy to miss]**
+
+The token alone gives no access. Each individual page or database the integration touches must be explicitly connected:
+
+1. Open the Companies Cards database: https://www.notion.so/1dfe53671ac88045ab59cd61c9f6d622
+2. Top-right `…` menu → **Connections** → **Connect to** → pick the Internal Integration (e.g. `VCAnalyzer`)
+3. Confirm. Child pages inherit access automatically.
+
+If you skip this step, the API returns `object_not_found` / 404 and looks like a token problem when it is actually a sharing problem.
 
 ### Database
 
@@ -71,7 +103,7 @@ The skill pushes to the **Companies Cards** database:
 - **Database ID:** `1dfe5367-1ac8-8045-ab59-cd61c9f6d622`
 - **URL:** https://www.notion.so/1dfe53671ac88045ab59cd61c9f6d622
 
-This is configured in `SKILL.md` lines 157–158. To change the target database, update those lines.
+This is configured in `SKILL.md` § Post-analysis pipeline step 8. To change the target database, update those lines and re-share the new DB with the integration.
 
 ### Database Schema
 
@@ -102,18 +134,29 @@ The Companies Cards database expects these properties:
 
 ### How It Works (2 steps)
 
-**Step 1 — Create page** via Notion API:
-```python
-POST https://api.notion.com/v1/pages
-# Body: parent database_id + properties (Company, Sector, Comment, Decision)
-```
-
-**Step 2 — Push memo content** via bundled script:
+**Step 1 — Create the page via curl** (NOT via `notion-create-pages` MCP — `parent` field double-serializes and fails):
 ```bash
-python scripts/push_to_notion.py <PAGE_ID> "output/memo.md" --token $NOTION_TOKEN
+curl -s -X POST "https://api.notion.com/v1/pages" \
+  -H "Authorization: Bearer $NOTION_TOKEN" \
+  -H "Notion-Version: 2022-06-28" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "parent": {"database_id": "1dfe5367-1ac8-8045-ab59-cd61c9f6d622"},
+    "properties": {
+      "Company": {"title": [{"text": {"content": "{Company}"}}]},
+      "Sector": {"rich_text": [{"text": {"content": "{Sector}"}}]},
+      "Comment": {"rich_text": [{"text": {"content": "{1-line headline}"}}]}
+    }
+  }'
+```
+Capture `id` from the response as `PAGE_ID`. Scoring columns (Suitability / Tech / Investors / Team / Momentum / Strategic / Legal & Risks / IPO / Secondary / CapTable / Valuation / Repeats) are left empty — those are for the analyst's manual IC scoring.
+
+**Step 2 — Push memo content via the script:**
+```bash
+python scripts/push_to_notion.py <PAGE_ID> "output/memo.md" --token "$NOTION_TOKEN"
 ```
 
-The script converts markdown to Notion blocks (headings, tables, bullets, dividers) and appends them in batches of 100 (Notion API limit).
+The script converts markdown to Notion blocks (headings, tables, bullets, callouts, dividers, code blocks) and appends them in batches of 100 (Notion API per-PATCH limit). Rich-text segments longer than 2000 chars are split automatically.
 
 ### Verify Connection
 
@@ -137,11 +180,23 @@ else:
 
 ### Notion Integration Setup (if not already done)
 
-1. Go to https://www.notion.so/my-integrations
-2. Create a new integration (or use existing)
-3. Copy the token (starts with `ntn_`)
-4. In your Companies Cards database, click **...** > **Connections** > add your integration
-5. Set the token as `NOTION_TOKEN` env var
+1. Go to https://www.notion.so/profile/integrations
+2. **+ New integration** → name it (e.g. `VCAnalyzer`) → Type: **Internal** → workspace: your RLC workspace
+3. Capabilities: ✅ Read content, ✅ Update content, ✅ Insert content
+4. Save → copy the **Internal Integration Secret** (starts with `ntn_…`)
+5. Open the Companies Cards database → `…` menu → **Connections** → connect the integration (workspace access is not enough)
+6. Set the token as a Windows User env var (see "Token setup" above)
+7. Verify with the script in "Verify Connection" below
+
+### Common Notion errors
+
+| Error | Likely cause | Fix |
+|---|---|---|
+| `401 unauthorized` | Token wrong, expired, or not set | Re-copy token from integration page; re-set env var; restart shell |
+| `404 object_not_found` on the database | Integration not shared with the DB | Open DB → `…` → Connections → add integration |
+| `400 validation_error` on `parent` field | Using `notion-create-pages` MCP (double-serializes) | Use curl directly per "Step 1" above |
+| Table cells appear blank after push | Used claude.ai MCP `notion-update-page` (paragraph-only) | Use `push_to_notion.py` script instead — full block support |
+| `claude.ai Notion` tool dropped mid-pipeline | MCP connector disconnected (harmless) | Script path is independent; Notion push still works |
 
 ---
 

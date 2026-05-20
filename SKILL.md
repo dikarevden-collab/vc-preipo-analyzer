@@ -184,13 +184,35 @@ Every research operation — initial memo generation **AND** any subsequent edit
    - `Both` → produce both
    - `None` → skip
    - See `references/speaker-narrative.md` for both variants.
-8. **Push to Notion** — ALWAYS run (unless Notion MCP unavailable). Create page in Companies Cards database, then `python scripts/push_to_notion.py PAGE_ID memo.md --token $NOTION_TOKEN`. Push the full memo if it was produced; otherwise push the Express Memo.
+8. **Push to Notion** — ALWAYS run (unless `NOTION_TOKEN` is absent — see config below). **Two-step procedure: [Low freedom — must follow]**
+   - **Step 8a — Create the page via curl** (NOT via the claude.ai Notion MCP `notion-create-pages` tool — its `parent` param double-serializes JSON objects and fails for database-parented pages):
+     ```bash
+     curl -s -X POST "https://api.notion.com/v1/pages" \
+       -H "Authorization: Bearer $NOTION_TOKEN" \
+       -H "Notion-Version: 2022-06-28" \
+       -H "Content-Type: application/json" \
+       -d '{
+         "parent": {"database_id": "1dfe5367-1ac8-8045-ab59-cd61c9f6d622"},
+         "properties": {
+           "Company": {"title": [{"text": {"content": "{Company}"}}]},
+           "Sector": {"rich_text": [{"text": {"content": "{Sector} — {Sub-sector}"}}]},
+           "Comment": {"rich_text": [{"text": {"content": "{1-line headline: last round + conviction}"}}]}
+         }
+       }'
+     ```
+     Capture the returned `id` as `PAGE_ID`. Leave the scoring columns (Suitability, Tech, Investors, Team, Momentum, Strategic, Legal & Risks, IPO, Secondary, CapTable, Valuation, Repeats) empty — those are for the analyst's manual IC scoring.
+   - **Step 8b — Push memo body via the script** (handles all block types — tables, headings, callouts, code blocks — within the 100-block-per-PATCH and 2000-char-per-rich-text Notion API limits, batched automatically):
+     ```bash
+     python scripts/push_to_notion.py PAGE_ID memo.md --token "$NOTION_TOKEN"
+     ```
+     Push the full memo if it was produced; otherwise push the Express Memo.
 9. **Report** file paths (only for deliverables actually produced), Gamma URL (if generated), Notion URL, and verification summary to user. Note which deliverables were skipped per the Deliverables Interview.
 
 **Notion export config:**
 - Database ID: `1dfe5367-1ac8-8045-ab59-cd61c9f6d622` (Companies Cards)
-- Token env var: `NOTION_TOKEN`
-- If Notion MCP is unavailable, skip export and inform user.
+- Token env var: `NOTION_TOKEN` — Internal Integration token (`ntn_…`), stored as a **Windows User env var** (`[System.Environment]::SetEnvironmentVariable("NOTION_TOKEN", "ntn_…", "User")`). The Companies Cards database must be explicitly shared with the integration via Connections menu — workspace-level access is not sufficient under Notion's current permission model.
+- **Path selection: prefer the curl + script combo over the claude.ai Notion MCP** for memo pushes. The MCP can disconnect mid-session, and its block schema only supports paragraph + bulleted_list_item — memo tables and headings would be silently dropped. The script path is the durable default; the MCP is fine for lookups (`notion-fetch`, `notion-search`) but not for content writes.
+- **If `NOTION_TOKEN` is unset**: skip the Notion push entirely, inform the user, and point them to `references/setup-guide.md` for one-time setup.
 
 ## Document Formatting
 
@@ -254,6 +276,9 @@ Load supporting files **selectively** — do not load everything up front:
 - **Company not found on secondary platforms**: record `[NO INFO]` per platform, note in memo — company may be too early-stage or not actively traded
 - **Gamma MCP unavailable**: skip IC deck + Speaker Narrative generation, inform user, continue with full memo + Express Memo + Notion
 - **Gamma generation fails**: warn user with error details, continue pipeline — Gamma is an enhancement, not core
+- **Notion MCP (`claude.ai Notion`) disconnected**: not a blocker — the Notion push uses curl + `push_to_notion.py` with `NOTION_TOKEN`, which is independent of the MCP. The MCP is only used for read operations (database lookups) if at all.
+- **`NOTION_TOKEN` not set**: skip Notion push, inform user, point them to `references/setup-guide.md` § "Notion setup" for the one-time token setup. Do NOT attempt the claude.ai MCP `notion-create-pages` fallback — it double-serializes the `parent` field and fails.
+- **Notion API 404 / "object_not_found" on page creation**: the integration is not shared with the Companies Cards database. Direct user to open the DB → `…` menu → Connections → connect their Internal Integration. Token alone is insufficient under Notion's current permission model.
 
 ## Quality Checks
 

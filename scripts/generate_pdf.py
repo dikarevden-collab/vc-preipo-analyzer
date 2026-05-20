@@ -67,168 +67,309 @@ if not XHTML2PDF_AVAILABLE and not REPORTLAB_AVAILABLE:
 # ============================================================
 
 NOTION_CSS = """
+/* RLC AltInvest — Investment Memo PDF Styling (Notion-inspired)
+   Fonts: Poppins (Google Fonts fallback for Gilroy) */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap');
+
 @page {
     size: A4;
-    margin: 2cm 2.5cm 2.5cm 2.5cm;
+    margin: 2cm 2cm 2.4cm 2cm;
+
+    @frame footer {
+        -pdf-frame-content: page-footer;
+        bottom: 0.6cm;
+        margin-left: 2cm;
+        margin-right: 2cm;
+        height: 1.0cm;
+    }
 }
 
 body {
-    font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-family: 'Poppins', 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-weight: 300;
     font-size: 10pt;
-    line-height: 1.6;
-    color: #37352f;
+    line-height: 1.55;
+    color: #262626;
     max-width: 100%;
 }
 
+/* --- Headings: Notion-style, prominent, dark blue --- */
+
 h1 {
-    font-size: 22pt;
+    font-family: 'Poppins', sans-serif;
     font-weight: 700;
-    color: #37352f;
-    margin-top: 24pt;
-    margin-bottom: 8pt;
-    padding-bottom: 4pt;
-    border-bottom: 1px solid #e0e0e0;
+    font-size: 22pt;
+    color: #1B2A4A;
+    margin-top: 20pt;
+    margin-bottom: 6pt;
+    padding-bottom: 0;
+    border-bottom: none;
+    letter-spacing: -0.3pt;
 }
 
 h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
     font-size: 16pt;
-    font-weight: 600;
-    color: #37352f;
-    margin-top: 20pt;
-    margin-bottom: 6pt;
+    color: #1B2A4A;
+    margin-top: 22pt;
+    margin-bottom: 8pt;
+    padding: 4pt 0 4pt 10pt;
+    border-left: 4pt solid #1B2A4A;
+    background-color: #F4F6FA;
+    letter-spacing: -0.2pt;
 }
 
 h3 {
-    font-size: 12pt;
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
-    color: #37352f;
+    font-size: 12pt;
+    color: #1B2A4A;
     margin-top: 14pt;
     margin-bottom: 4pt;
 }
 
 h4 {
-    font-size: 10pt;
+    font-family: 'Poppins', sans-serif;
     font-weight: 600;
-    color: #37352f;
+    font-size: 10.5pt;
+    color: #1B2A4A;
     margin-top: 10pt;
-    margin-bottom: 4pt;
+    margin-bottom: 3pt;
 }
 
+/* --- Body text --- */
+
 p {
-    margin-bottom: 6pt;
+    margin-bottom: 5pt;
     margin-top: 2pt;
 }
 
 strong {
     font-weight: 600;
-    color: #37352f;
+    color: #262626;
 }
 
 em {
     font-style: italic;
-    color: #6b6b6b;
+    font-size: 9pt;
+    color: #5D6D7E;
 }
 
 code {
-    background-color: #f7f6f3;
+    background-color: #F0F4F8;
     padding: 1pt 4pt;
     border-radius: 3pt;
-    font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+    font-family: 'Consolas', 'Liberation Mono', Menlo, monospace;
     font-size: 9pt;
-    color: #eb5757;
+    color: #DE213E;
 }
 
 pre {
-    background-color: #f7f6f3;
+    background-color: #F0F4F8;
     padding: 10pt;
     border-radius: 4pt;
-    font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, monospace;
+    font-family: 'Consolas', 'Liberation Mono', Menlo, monospace;
     font-size: 8.5pt;
     line-height: 1.5;
     overflow-x: auto;
     margin: 6pt 0;
 }
 
+/* --- Blockquote: Notion callout style --- */
+
 blockquote {
-    border-left: 3pt solid #e0e0e0;
-    padding-left: 12pt;
-    margin-left: 0;
-    color: #6b6b6b;
-    font-style: italic;
+    border-left: 3pt solid #DE213E;
+    padding: 8pt 12pt;
+    margin: 8pt 0 12pt 0;
+    background-color: #FDF2F2;
+    color: #5D6D7E;
+    font-size: 8.5pt;
+    border-radius: 3pt;
 }
+
+blockquote p {
+    margin: 0;
+}
+
+/* --- Lists: tight, left-flush --- */
 
 ul, ol {
     margin-top: 2pt;
     margin-bottom: 6pt;
-    padding-left: 20pt;
+    padding-left: 14pt;
+}
+
+ul {
+    list-style-type: disc;
 }
 
 li {
     margin-bottom: 2pt;
+    padding-left: 2pt;
+    line-height: 1.5;
+}
+
+li > ul, li > ol {
+    margin-top: 2pt;
+    margin-bottom: 2pt;
+    padding-left: 14pt;
 }
 
 hr {
     border: none;
-    border-top: 1px solid #e0e0e0;
-    margin: 16pt 0;
+    border-top: 0.5pt solid #D5DDE5;
+    margin: 14pt 0;
 }
+
+/* --- Tables: Notion-inspired, minimal borders, fixed layout --- */
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin: 8pt 0;
-    font-size: 8.5pt;
+    font-size: 9pt;
+    border: none;
+    -pdf-keep-with-next: false;
+    table-layout: fixed;
+}
+
+col {
+    /* widths injected by post-processor */
 }
 
 thead {
-    background-color: #f7f6f3;
+    background-color: #1B2A4A;
 }
 
 th {
     font-weight: 600;
     text-align: left;
-    padding: 6pt 8pt;
-    border-bottom: 2px solid #e0e0e0;
-    color: #37352f;
-    white-space: nowrap;
+    padding: 7pt 9pt;
+    color: #FFFFFF;
+    border: none;
+    font-size: 8.5pt;
+    letter-spacing: 0.2pt;
 }
 
 td {
-    padding: 5pt 8pt;
-    border-bottom: 1px solid #ececec;
+    padding: 6pt 9pt;
+    border-top: 0.5pt solid #E5E9EF;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
     vertical-align: top;
+    font-size: 9pt;
+    line-height: 1.45;
 }
 
-tr:nth-child(even) {
-    background-color: #fafafa;
+tr:nth-child(even) td {
+    background-color: #F7F9FC;
 }
 
-.status-neutral { color: #d9730d; font-weight: 600; }
-.status-buy { color: #0f7b0f; font-weight: 600; }
-.status-pass { color: #e03e3e; font-weight: 600; }
+tr:nth-child(odd) td {
+    background-color: #FFFFFF;
+}
+
+/* First column emphasis for key-value tables */
+td:first-child {
+    font-weight: 500;
+    color: #1B2A4A;
+}
+
+/* --- Memo header --- */
 
 .memo-header {
     text-align: center;
-    padding-bottom: 12pt;
-    margin-bottom: 12pt;
-    border-bottom: 2px solid #37352f;
+    padding-bottom: 10pt;
+    margin-bottom: 14pt;
+    border-bottom: 2pt solid #1B2A4A;
 }
 
 .memo-header h1 {
     border-bottom: none;
     margin-bottom: 4pt;
+    color: #DE213E;
+    font-size: 18pt;
+    padding: 0;
+    background: none;
 }
 
 .memo-meta {
     font-size: 9pt;
-    color: #6b6b6b;
+    color: #5D6D7E;
     margin: 2pt 0;
 }
 
-td:first-child {
-    font-weight: 500;
+/* --- Links --- */
+
+a {
+    color: #00B0F0;
+    text-decoration: none;
+}
+
+/* --- Page footer --- */
+
+#page-footer {
+    font-size: 8pt;
+    color: #5D6D7E;
+    text-align: right;
+    border-top: 0.3pt solid #E5E9EF;
+    padding-top: 3pt;
 }
 """
+
+
+def _strip_tags(s: str) -> str:
+    """Strip HTML tags for text-length comparison."""
+    return re.sub(r'<[^>]+>', '', s).strip()
+
+
+def inject_colgroups(html: str) -> str:
+    """Inject <colgroup> with explicit column widths into every <table>.
+
+    Heuristic for column widths:
+    - 2 cols: 30% / 70% (key-value layout)
+    - 3+ cols: if first header cell is empty OR ≤1 word, treat as row-label column → narrower
+              otherwise equal-width across all columns
+    """
+    def fix_table(match):
+        table_html = match.group(0)
+        if '<colgroup' in table_html:
+            return table_html  # already has colgroup
+
+        first_row_m = re.search(r'<tr>(.*?)</tr>', table_html, re.DOTALL)
+        if not first_row_m:
+            return table_html
+
+        header_cells = re.findall(r'<th[^>]*>(.*?)</th>', first_row_m.group(1), re.DOTALL)
+        if not header_cells:
+            header_cells = re.findall(r'<td[^>]*>(.*?)</td>', first_row_m.group(1), re.DOTALL)
+        ncols = len(header_cells)
+        if ncols == 0:
+            return table_html
+
+        first_text = _strip_tags(header_cells[0])
+        first_is_label_col = (len(first_text) == 0) or (len(first_text.split()) <= 1 and len(first_text) <= 10)
+
+        if ncols == 1:
+            widths = [100.0]
+        elif ncols == 2:
+            widths = [30.0, 70.0]
+        elif first_is_label_col:
+            label_w = 22.0 if ncols >= 4 else 26.0
+            other_w = (100.0 - label_w) / (ncols - 1)
+            widths = [label_w] + [other_w] * (ncols - 1)
+        else:
+            widths = [100.0 / ncols] * ncols
+
+        colgroup = '<colgroup>' + ''.join(
+            f'<col style="width:{w:.2f}%"/>' for w in widths
+        ) + '</colgroup>'
+        return re.sub(r'(<table[^>]*>)', r'\1' + colgroup, table_html, count=1)
+
+    return re.sub(r'<table[^>]*>.*?</table>', fix_table, html, flags=re.DOTALL)
 
 
 def enhance_html(html: str) -> str:
@@ -254,6 +395,7 @@ def enhance_html(html: str) -> str:
             end_pos = h1_match.end() + pos
             html = html[:h1_match.start()] + header_html + html[end_pos:]
 
+    html = inject_colgroups(html)
     return html
 
 
@@ -279,6 +421,10 @@ def convert_xhtml2pdf(md_path: str, pdf_path: str) -> bool:
 </head>
 <body>
 {html_body}
+
+<div id="page-footer">
+    <pdf:pagenumber />
+</div>
 </body>
 </html>"""
 

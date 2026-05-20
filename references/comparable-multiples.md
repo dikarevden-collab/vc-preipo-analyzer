@@ -1,5 +1,15 @@
 # Comparable Public Multiples — Methodology Reference
 
+## Table of Contents
+
+- [Comp Selection Criteria](#comp-selection-criteria)
+- [Key Multiples by Business Model](#key-multiples-by-business-model)
+- [Private Company Discount Framework](#private-company-discount-framework)
+- [Comp Table Template](#comp-table-template)
+- [Implied Valuation Summary](#implied-valuation-summary)
+- [Common Pitfalls](#common-pitfalls)
+- [Data Sources](#data-sources)
+
 ## Comp Selection Criteria
 
 When building a comparable company set, apply these filters in order of priority:

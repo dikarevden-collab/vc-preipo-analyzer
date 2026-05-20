@@ -2,6 +2,20 @@
 
 These overlays extend the core analysis framework with sector-specific metrics, questions, and benchmarks. Apply the relevant overlay based on the company's primary sector.
 
+**Load only the matching sector section** — do not read all overlays.
+
+## Table of Contents
+
+- [SaaS / Cloud Software](#saas--cloud-software)
+- [Cross-Border Payments / Remittance](#cross-border-payments--remittance)
+- [Fintech](#fintech)
+- [Medtech / Biotech](#medtech--biotech)
+- [AI / ML](#ai--ml)
+- [Infrastructure / Industrials](#infrastructure--industrials)
+- [Semiconductors / Chips](#semiconductors--chips)
+- [Marketplace / Platform](#marketplace--platform)
+- [Consumer / D2C](#consumer--d2c)
+
 ---
 
 ## SaaS / Cloud Software

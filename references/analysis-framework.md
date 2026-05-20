@@ -2,6 +2,22 @@
 
 When analyzing a company, follow this structured sequence. Each section builds on the previous.
 
+## Table of Contents
+
+- [1. Company Overview](#1-company-overview)
+- [2. Financial Deep Dive](#2-financial-deep-dive)
+- [3. Comparable Public Multiples Analysis](#3-comparable-public-multiples-analysis)
+- [3.5 Secondary Market Pricing](#35-secondary-market-pricing)
+- [4. Market Context & Competitive Position](#4-market-context--competitive-position)
+- [5. Growth & Momentum](#5-growth--momentum)
+- [6. Investor & Governance Quality](#6-investor--governance-quality)
+- [7. Risk Assessment Matrix](#7-risk-assessment-matrix)
+- [8. Valuation & Return Analysis](#8-valuation--return-analysis) — incl. 8.1 Deal Mechanics for multi-tranche deals
+- [9. Investment Thesis](#9-investment-thesis)
+- [10. Supporting Materials & Data Room](#10-supporting-materials--data-room)
+- [11. Verification Report (auto-generated)](#11-verification-report-auto-generated)
+- [12. Appendix (optional)](#12-appendix-optional)
+
 ## 1. Company Overview
 - Full legal name and DBA
 - Business description (what they do, for whom, how they monetize)
@@ -109,21 +125,51 @@ Score each dimension 1-10 (1 = minimal risk, 10 = critical risk):
 - Overall risk classification: Low (1-3) / Moderate (4-5) / Elevated (6-7) / High (8-10)
 
 ## 8. Valuation & Return Analysis
+
+### 8.1 Deal Mechanics (for non-trivial deal structures)
+
+**Include this subsection if the deal is structurally complex** — multi-tranche, SPAC/de-SPAC, SAFE conversion, tender offer, primary + secondary mix, or any instrument with non-standard conversion mechanics. Skip for plain primary or secondary equity.
+
+For each tranche / instrument offered, document:
+- Instrument type (SAFE / PIPE / direct primary / secondary / SPV unit / etc.)
+- Pricing (headline + any discount mechanic)
+- Effective entry valuation (analyst math)
+- Day-1 paper gain at par (entry vs. fair value)
+- Net Day-1 gain after vehicle/SPV fees
+- Lockup
+- Capacity available
+- What happens if the deal mechanics fail (SPAC doesn't close, round fails to fill)
+- Status (signed / open / pending)
+
+Use a single side-by-side comparison table when multiple tranches are offered.
+
+### 8.2 Current Pricing
+
 - Current valuation (last round and/or secondary) vs. fundamental value
 - Implied multiples at current valuation (EV/Revenue, EV/Gross Profit, etc.)
+- For multi-tranche deals: implied multiples at EACH effective entry price (e.g., post-discount SAFE valuation, post-discount PIPE valuation)
 - Comparison to public comp implied range (from Section 3)
-- Scenario-based return analysis:
 
-| Scenario   | Probability | Exit Multiple | Exit Valuation | IRR (3yr) | IRR (5yr) | MOIC |
-|------------|-------------|---------------|----------------|-----------|-----------|------|
-| Bull Case  |             |               |                |           |           |      |
-| Base Case  |             |               |                |           |           |      |
-| Bear Case  |             |               |                |           |           |      |
-| **Expected**|            |               |                |           |           |      |
+### 8.3 Scenario Analysis
 
-- Probability-weighted expected return
-- Sensitivity table: IRR at various entry prices and exit multiples
-- Exit pathway assessment (IPO timeline, likely acquirers, secondary liquidity)
+Scenario-based return analysis. **For multi-tranche deals, show MOIC and IRR per tranche** (the underlying scenarios are identical, but entry prices differ):
+
+| Scenario   | Probability | Exit Multiple | Exit Valuation | [Tranche A] MOIC | [Tranche A] IRR | [Tranche B] MOIC | [Tranche B] IRR |
+|------------|-------------|---------------|----------------|------------------|-----------------|------------------|-----------------|
+| Bull Case  |             |               |                |                  |                 |                  |                 |
+| Base Case  |             |               |                |                  |                 |                  |                 |
+| Bear Case  |             |               |                |                  |                 |                  |                 |
+| **Expected** |           |               |                |                  |                 |                  |                 |
+
+State whether MOIC/IRR figures are **gross** or **net of fees** (and the fee assumptions used). Standard is to show both: gross at the deal level, then net after applying SPV/vehicle 2/20 (or actual) fee structure over the hold period.
+
+### 8.4 Sensitivity Analysis
+
+Sensitivity table: IRR (and MOIC) at various entry prices and exit multiples. For multi-tranche deals, sensitivity is most useful at the BEST tranche's entry price (since that's the most attractive available cost basis).
+
+### 8.5 Exit Pathways
+
+Exit pathway assessment (IPO timeline, likely acquirers, secondary liquidity). For SPAC deals, include the "SPAC merger fails to close" scenario explicitly with its consequences per tranche.
 
 ## 9. Investment Thesis
 - **Conviction rating**: Strong Pass / Pass / Neutral / Buy / Strong Buy
@@ -150,3 +196,15 @@ After drafting sections 1-10, launch an independent verification agent that:
 - Produces an Accuracy Score = confirmed / (confirmed + disputed)
 - Flags DISPUTED claims inline in the memo for analyst review
 - This section is appended automatically — do not write it manually
+
+**On memo rewrites:** If the memo is substantially rewritten after initial verification (e.g., new deal-structure details from GP, corrected framing), append an "Update — {date}" sub-section to the existing Verification Report describing what changed and what was re-verified. Re-run a focused verification pass (not the full original) — checking only: (1) internal arithmetic consistency, (2) new claims added in the rewrite, (3) stale-data spot-check on time-sensitive facts (valuations, leadership roles, public stock prices).
+
+## 12. Appendix (optional)
+
+Use this section for analytical commentary that does not fit cleanly in Sections 1–11 but is material to the IC's understanding. Examples:
+- Why this deal is structured the way it is (e.g., "Why a SPAC and not a private round?")
+- Cross-cycle / cross-comparable historical context
+- Detailed walk-throughs of specific risk scenarios
+- Counterfactual analysis (what would change our view)
+
+Keep to one focused topic per Appendix item; multiple appendices can use sub-headings (12.1, 12.2, etc.). The full memo retains its conviction rating in Section 9 — the Appendix does not duplicate the recommendation, it provides structural / analytical context that informs it.

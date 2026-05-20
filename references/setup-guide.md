@@ -2,6 +2,13 @@
 
 Quick setup for Notion integration, PDF generation, and Python dependencies.
 
+## Table of Contents
+
+- [1. Python Dependencies](#1-python-dependencies)
+- [2. Notion Integration](#2-notion-integration)
+- [3. PDF Generation](#3-pdf-generation)
+- [4. Quick Start Checklist](#4-quick-start-checklist)
+
 ---
 
 ## 1. Python Dependencies

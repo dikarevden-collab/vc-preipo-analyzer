@@ -2,6 +2,18 @@
 
 Structured checklist for Pre-IPO and late-stage VC investment due diligence.
 
+## Table of Contents
+
+- [Financial Due Diligence](#financial-due-diligence)
+- [Commercial Due Diligence](#commercial-due-diligence)
+- [Market Due Diligence](#market-due-diligence)
+- [Technology & Product](#technology--product)
+- [Team & Organization](#team--organization)
+- [Legal](#legal)
+- [Investor & Governance](#investor--governance)
+- [Valuation Cross-Checks](#valuation-cross-checks)
+- [Completeness Scoring](#completeness-scoring)
+
 ## Financial Due Diligence
 
 - [ ] Audited financial statements (last 2-3 years)

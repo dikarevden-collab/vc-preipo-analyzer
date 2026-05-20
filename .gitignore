@@ -2,3 +2,5 @@ output/
 FAQ.md
 .agents/
 .claude/
+__pycache__/
+*.pyc

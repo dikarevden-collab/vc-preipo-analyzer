@@ -95,6 +95,7 @@ When analyzing a company, follow this structured sequence. Each section builds o
 - Sales efficiency metrics (Magic Number, CAC Ratio)
 - Hiring velocity and key talent acquisition
 - Product roadmap and upcoming catalysts
+- **Crunchbase Signals** (captured per SKILL.md § Crunchbase Signals Capture): **Growth Score** (0-100, with arrow), **CB Rank** (integer, lower = better, with arrow), **Heat Score** (0-100, with arrow). Date-stamp the values and add one line of analyst commentary using the interpretation rubric — arrows matter as much as the numbers. Example commentary: *"Heat 92 ↑ reflects active news cycle from Series B close; Growth 86 ↓ shows the underlying employee/traffic momentum is decelerating from a 12-month peak — interpret as 'currently in the spotlight but the fundamentals were stronger six months ago.'"* Mark `[NO INFO]` if analyst declined to provide and no Crunchbase PDF was supplied.
 
 ## 6. Investor & Governance Quality
 - Lead investors by round with track record assessment

@@ -74,6 +74,27 @@ Present these questions to the user as a numbered list. Wait for answers before 
 - For other questions: if user says "just run it" or "skip interview" → proceed with company name + counterparty only, produce generic analysis on remaining dimensions
 - After materials are ingested (PDFs, Excel), reassess which questions are already answered by the documents before asking remaining ones
 
+## Crunchbase Signals Capture **[Low freedom — must follow]**
+
+Three third-party momentum proxies from Crunchbase's company profile must be captured for every memo and carried into **Section 5 Growth & Momentum**: **Growth Score** (0–100, employee/traffic/funding velocity), **CB Rank** (integer; lower = better global rank), **Heat Score** (0–100, short-term activity surge). Each carries a trend arrow (↑/↓) that matters as much as the value.
+
+**Capture protocol (in priority order):**
+
+1. **If a Crunchbase PDF is in the intake materials** (typical filename: `Crunchbase.pdf`, or any PDF whose first page contains the Crunchbase logo + the company name): read the three scores **and their trend arrows** from page 1 visually via the `Read` tool. Crunchbase PDFs are image-based — `extract_pdf.py` returns empty text; the Read tool's multimodal view is the working path. Record the values + arrows + the access date of the PDF.
+
+2. **Else, present a single AskUserQuestion chip** asking the analyst for all three scores in one round-trip. Use this chip text:
+   - Header: `Crunchbase signals`
+   - Question: `What are the current Crunchbase signals for {Company}? Check the company's Crunchbase profile (https://www.crunchbase.com/organization/{slug}) and report Growth Score, CB Rank, and Heat Score, each with its trend arrow (↑ or ↓).`
+   - Free-text input — analyst pastes a single line, e.g. `Growth 86 ↓, CB Rank 47 ↑, Heat 92 ↑`.
+
+3. **Else (analyst declines or marks unknown)**: record `[NO INFO]` for all three fields and continue. Do not block the pipeline.
+
+**Interpretation rubric** (for the analyst's written commentary in Section 5, not for the table):
+- **CB Rank**: <100 = top-tier global; 100–1,000 = top stratum; 1,000–10,000 = mid; >10,000 = niche. Arrow direction: ↑ = climbing toward 1 (improving); ↓ = falling away from 1 (deteriorating).
+- **Growth Score**: <30 = stalled; 30–60 = moderate; 60–80 = strong; 80–100 = breakout. Arrow: ↑ = improving; ↓ = decelerating from peak.
+- **Heat Score**: <30 = quiet; 30–60 = active; 60–80 = hot; 80–100 = inflecting / viral. Arrow: ↑ = surging now; ↓ = post-peak / cooling.
+- A combination like *Heat 92 ↑ with Growth 86 ↓* means the company is in the news (e.g., just-closed round) but the underlying growth signal is decelerating — flag in commentary, do not present numbers without context.
+
 ## Sector Detection & Specialization
 
 Automatically detect the company's sector and apply the relevant overlay from `references/sector-overlays.md`. **Read only the matching sector section** — do not load all overlays. If ambiguous, ask the user to confirm.

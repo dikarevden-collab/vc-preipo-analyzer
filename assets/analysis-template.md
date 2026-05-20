@@ -245,6 +245,16 @@ Use this structure for all VC/Pre-IPO analysis output. Save the completed memo a
 - [Metric 2]: [Value] ([trend])
 - [Metric 3]: [Value] ([trend])
 
+**Crunchbase Signals** *(as of [date])*:
+
+| Signal | Value | Trend | Interpretation |
+|--------|-------|-------|----------------|
+| Growth Score | [0-100] | [↑/↓] | [stalled / moderate / strong / breakout] |
+| CB Rank | [integer] | [↑/↓] | [top-tier / top stratum / mid / niche] |
+| Heat Score | [0-100] | [↑/↓] | [quiet / active / hot / inflecting] |
+
+**Commentary on signals:** [one-line analyst read using the interpretation rubric — note when arrow direction conflicts with value, e.g. "Heat 92 ↑ + Growth 86 ↓ = currently in the news but the underlying momentum is decelerating"].
+
 **Recent Achievements:**
 - [Achievement 1]
 - [Achievement 2]

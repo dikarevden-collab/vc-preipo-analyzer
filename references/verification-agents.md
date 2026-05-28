@@ -29,6 +29,7 @@ After the memo draft is written and before PDF/Notion export, launch an **indepe
 > 5. **Public comp data** — market caps, multiples, revenue (cross-check vs Yahoo Finance)
 > 6. **Partnership/customer claims** — named partners, contract details
 > 7. **Investor roster** — named investors, round participation
+> 8. **Forbidden content — universal no-recommendation rule** — flag ANY of the following as forbidden content for removal before delivery: "Conviction Rating: X" header lines, "Recommendation: X" headers, "the recommended position is X" sentences, "Bias toward Buy" / "default to Pass" subtitles, "Position Sizing recommendation" subsections, Buy / Hold / Pass / Proceed / Wait / Neutral verdict labels presented as the memo's view. Balanced Reasons-to-Invest / Reasons-NOT-to-Invest lists STAY (they are informational). See `feedback_express_memo_no_recommendation.md` for the full rule.
 >
 > Output a structured verification report in this exact format:
 >
@@ -71,7 +72,7 @@ After the express memo is drafted, run a **focused verification pass** (`Agent` 
 > Your job is **not** to re-verify every fact. Your job is to catch:
 > 1. **Distillation drift** — any number, date, name, or claim in the express memo that does not appear (with the same value) in the full memo
 > 2. **Stale data** — any time-sensitive fact (valuation, stock price, market cap, leadership role) where >30 days have passed since the full memo was verified. Spot-check 5-10 of the most-cited numbers on the current public web
-> 3. **Forbidden content** — flag any Recommendation / Conviction / Buy-Hold-Pass / position-sizing / escalation-trigger language in the Express Memo. By policy, the Express Memo does not carry a recommendation; if any such section or line is present, flag it for removal before delivery.
+> 3. **Forbidden content** — flag any Recommendation / Conviction / Buy-Hold-Pass / position-sizing / escalation-trigger language in the Express Memo. By policy, NO deliverable produced by this skill (full memo, Express Memo, IC Brief, slide narrative, Gamma deck) carries a recommendation or conviction rating; if any such section or line is present, flag it for removal before delivery. See `feedback_express_memo_no_recommendation.md` for the full universal rule.
 >
 > Output format:
 >

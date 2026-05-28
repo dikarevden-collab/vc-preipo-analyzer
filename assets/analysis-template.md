@@ -11,14 +11,12 @@ Use this structure for all VC/Pre-IPO analysis output. Save the completed memo a
 **Date:** [Analysis Date]
 **Analyst:** [Name / Auto-generated]
 **Data Freshness:** [Date of most recent data used]
-**Conviction Rating:** [Strong Pass / Pass / Neutral / Buy / Strong Buy]
-**Status:** Draft — pending human review
 
 ---
 
 ## Executive Summary
 
-[2-3 paragraph synthesis: what the company does, why it matters, key financials, valuation assessment against public comps, and bottom-line recommendation. This should be readable as a standalone summary for a quick decision. A senior decision-maker should be able to read ONLY this section and understand the opportunity, the key risk, and the recommendation.]
+[2-3 paragraph synthesis: what the company does, why it matters, key financials, valuation assessment against public comps, and the analytical synthesis — what the situation is, what would have to be true for it to work, what the key open structural items are. Readable as a standalone summary; a senior decision-maker should be able to read ONLY this section and understand the opportunity and the key risk. **No conviction rating, no "recommended position," no Buy/Hold/Pass verdict** — the committee decides from the balanced inputs. See `feedback_express_memo_no_recommendation.md`.]
 
 ---
 
@@ -350,7 +348,7 @@ Use this structure for all VC/Pre-IPO analysis output. Save the completed memo a
 
 ## 9. Investment Thesis
 
-### Recommendation: **[Strong Pass / Pass / Neutral / Buy / Strong Buy]**
+*Balanced pro/con analysis, key catalysts, de-risking milestones, and remaining diligence questions for the committee. **No conviction rating, no Buy/Hold/Pass verdict, no "Recommendation" header, no "recommended position" language.** The section captures the analytical thesis; the committee decides from the inputs.*
 
 ### Reasons to Invest
 1. [Reason with specific evidence]

@@ -164,7 +164,7 @@ Load `references/analysis-framework.md` when starting. Each section's detailed c
 7. **Risk Assessment** — weighted 8-dimension scoring matrix
 8. **Valuation & Return** — scenarios, IRR, MOIC, exit pathways, secondary-implied valuation
 - [ ] Checkpoint: scenario probabilities sum to 100%; IRR uses consistent entry valuation
-9. **Investment Thesis** — conviction rating, for/against, remaining questions
+9. **Investment Analysis** — balanced pro/con, key catalysts, de-risking milestones, remaining diligence questions. **No conviction rating, no Buy/Hold/Pass verdict, no "recommended position" language** — committee decides from inputs. Applies to all deliverables (full memo, Express, IC Brief, narrative, deck). See `feedback_express_memo_no_recommendation.md`.
 10. **Supporting Materials** — data room, articles, pitch deck notes
 - [ ] Checkpoint: memo saved, PDF generated, Express Memo generated, Gamma deck generated, Notion updated (if NOTION_TOKEN set)
 
@@ -232,7 +232,7 @@ Every research operation — initial memo generation **AND** any subsequent edit
          "properties": {
            "Company": {"title": [{"text": {"content": "{Company}"}}]},
            "Sector": {"rich_text": [{"text": {"content": "{Sector} — {Sub-sector}"}}]},
-           "Comment": {"rich_text": [{"text": {"content": "{1-line headline: last round + conviction}"}}]}
+           "Comment": {"rich_text": [{"text": {"content": "{1-line headline: last round + key analytical observation. NO conviction rating, NO Buy/Hold/Pass language — committee decides.}"}}]}
          }
        }'
      ```

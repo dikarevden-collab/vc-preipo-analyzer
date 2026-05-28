@@ -28,7 +28,7 @@ Two variants supported. Default is the **10-min IC Brief aligned to Express Memo
 
 | Express Memo section | Brief slot | Speaking time |
 |---|---|---|
-| (Title + Conviction) | Opening | ~30 sec |
+| Opening (situation framing — NO conviction announcement) | Opening | ~30 sec |
 | 1. Company Overview | Slot 1 | ~1 min |
 | 2. Deal Terms (incl. "How this deal works") | Slot 2 | ~1.5–2 min — densest content |
 | 3. Market Context | Slot 3 | ~1 min |

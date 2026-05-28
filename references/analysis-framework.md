@@ -173,12 +173,13 @@ Sensitivity table: IRR (and MOIC) at various entry prices and exit multiples. Fo
 Exit pathway assessment (IPO timeline, likely acquirers, secondary liquidity). For SPAC deals, include the "SPAC merger fails to close" scenario explicitly with its consequences per tranche.
 
 ## 9. Investment Thesis
-- **Conviction rating**: Strong Pass / Pass / Neutral / Buy / Strong Buy
+
+**[Low freedom — no recommendations]** No deliverable produced by this skill carries a Conviction Rating, Buy/Hold/Pass verdict, "Recommendation:" header, position-sizing recommendation, or "recommended position is X" language. The section is named "Investment Thesis" because it captures the analytical thesis (the balanced case for and against, key catalysts, milestones, open questions) — it does NOT render a verdict. Applies to the full memo, the Express Memo, the IC Brief, the slide-by-slide speaker narrative, and the Gamma deck. The committee decides from balanced inputs. See `feedback_express_memo_no_recommendation.md` for the full rule.
+
 - **Top 3-5 reasons to invest** (with specific supporting evidence)
 - **Top 3-5 reasons NOT to invest** (with specific counter-arguments)
 - **Key catalysts** that could inflect the investment positively
 - **Key de-risking milestones** to monitor
-- **Position sizing recommendation** (relative to portfolio context)
 - **Follow-up diligence questions** that remain unanswered
 
 ## 10. Supporting Materials & Data Room
@@ -208,4 +209,4 @@ Use this section for analytical commentary that does not fit cleanly in Sections
 - Detailed walk-throughs of specific risk scenarios
 - Counterfactual analysis (what would change our view)
 
-Keep to one focused topic per Appendix item; multiple appendices can use sub-headings (12.1, 12.2, etc.). The full memo retains its conviction rating in Section 9 — the Appendix does not duplicate the recommendation, it provides structural / analytical context that informs it.
+Keep to one focused topic per Appendix item; multiple appendices can use sub-headings (12.1, 12.2, etc.). The Appendix carries structural / analytical context that informs the committee's reading of Sections 1–11 — it does NOT add a recommendation or conviction rating (no deliverable carries either, per the universal no-recommendation rule).

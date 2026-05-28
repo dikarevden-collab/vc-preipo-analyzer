@@ -51,8 +51,8 @@ Pass the following as `additionalInstructions`:
 > Create a 20-slide investment committee presentation with this exact structure:
 >
 > **Opening (slides 1-3)**
-> 1. Title slide: Company name, date, "Investment Committee Presentation", conviction rating badge
-> 2. Executive Summary: 3-4 bullet synthesis — what the company does, key financials, bottom-line recommendation
+> 1. Title slide: Company name, date, "Investment Committee Presentation". **No conviction badge / no "Conviction: X" subtitle** (universal no-recommendation rule). Subtitle should describe the situation or sector — e.g. "{Sector} — {Latest Round Headline}".
+> 2. Executive Summary: 3-4 bullet synthesis — what the company does, key financials, the analytical situation. **No "bottom-line recommendation" / no Buy-Hold-Pass.** End with what would have to be true for the deal to clear, or what the open structural items are — committee decides.
 > 3. Deal Overview: entry valuation, deal structure, share class, investment horizon, target return
 >
 > **Company & Market (slides 4-7)**
@@ -80,7 +80,7 @@ Pass the following as `additionalInstructions`:
 >
 > **Conclusion (slides 19-20)**
 > 19. Investment Thesis — For: top 3-5 reasons to invest (left column) vs Against: top 3-5 reasons NOT to invest (right column)
-> 20. Investment Team Recommendation: final conviction rating, key milestones, remaining DD, vote request. This must always be the last slide.
+> 20. Decision Inputs for the Committee: open structural items, key de-risking milestones to monitor, remaining DD questions, and a single hand-off line ("The committee has the inputs — the floor is yours"). **No "Recommendation" header, no "Conviction Rating: X", no vote request.** This must always be the last slide.
 >
 > Use tables and structured layouts over prose. Keep bullet points to 4-6 per slide maximum. Use bold for key numbers. No decorative images — this is a data-driven IC deck.
 

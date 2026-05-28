@@ -25,7 +25,7 @@ Senior IC members typically do not read 40-page memos cold. The express memo is 
 
 - **No new claims, no new sources.** Every fact in the express memo must trace to the verified full memo. Citing the full memo as the source is correct; introducing external citations not already in the full memo is not.
 - **No new numbers.** Round, summarize, or omit — but never introduce a figure (revenue, multiple, growth rate, valuation) that does not appear in the full memo.
-- **No recommendation, no verdict, no conviction rating.** The Express Memo presents the case both ways and the pre-conditions; the reader decides. Do NOT include Proceed/Wait/Pass, Buy/Hold, position-sizing, or escalation triggers. Those belong to the full memo (Section 9), not here.
+- **No recommendation, no verdict, no conviction rating.** The Express Memo presents the case both ways and the pre-conditions; the reader decides. Do NOT include Proceed/Wait/Pass, Buy/Hold, position-sizing, or escalation triggers. **This is the universal rule** — the full memo, the IC Brief, the slide narrative, and the Gamma deck are also bound by it. See `feedback_express_memo_no_recommendation.md`.
 - **Inherit verification.** Facts already verified at the full-memo stage do not need re-verification. Only distillation drift (rounding errors, dropped qualifiers, stale dates) needs a focused check.
 
 ## Structure Template
@@ -152,8 +152,8 @@ Keep to one focused topic per Appendix item; multiple appendices can use sub-hea
 
 - The Express Memo presents facts and balanced analysis (Strengths AND Weaknesses; Tailwinds AND Headwinds; Risks across multiple categories). It does NOT state a Proceed / Wait / Pass verdict, conviction rating, position-sizing guidance, or escalation trigger.
 - The reader (IC, partner, LP) makes the call. The memo's job is to give them the inputs cleanly — not to pre-decide.
-- The full memo retains the conviction rating, position sizing, and remaining-diligence list (Section 9). That is where the recommendation lives — not here.
-- If any section header reads "Recommendation," "Conviction," or "Verdict" in the Express Memo, delete it before delivery.
+- **The same rule applies to the full memo, IC Brief, slide-by-slide speaker narrative, and Gamma deck.** No deliverable produced by this skill carries a Conviction Rating, Buy/Hold/Pass verdict, "Recommendation:" header, or position-sizing recommendation. The full memo's Section 9 (Investment Analysis) carries balanced pro/con / catalysts / milestones / open DD questions but no verdict. See `feedback_express_memo_no_recommendation.md`.
+- If any section header reads "Recommendation," "Conviction," or "Verdict" in ANY deliverable, delete it before delivery.
 
 ## Clarity Discipline **[Low freedom — must follow]**
 
